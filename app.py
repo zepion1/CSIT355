@@ -1,9 +1,9 @@
 import mysql.connector
 from mysql.connector import Error
 
+#Create the connection to database
 def connect_to_database():
-    try:
-        # Create the connection to database
+    try:  
         connection = mysql.connector.connect(
             host='127.0.0.1',         
             user='zepion1',     
@@ -16,7 +16,8 @@ def connect_to_database():
         print(f"Error: {e}")
         return None
     
-def init_sql(connection, init_file = 'init.sql'): #Initialize init.sql with mock data
+#Initialize init.sql with mock data   
+def init_sql(connection, init_file = 'init.sql'): 
     try:
         cursor = connection.cursor()
         with open(init_file,'r') as file:
@@ -34,15 +35,29 @@ def init_sql(connection, init_file = 'init.sql'): #Initialize init.sql with mock
         cursor.close()
 
 
-def list_courses(cursor): #list all available courses
-    query = """ SELECT c.course_name, c.description, p.pname, c.capacity
-                FROM courses c, professors p
-                Where c.professor_id = p.professor_id"""
-    cursor.execute(query)
-    courses = cursor.fetchall()
-    for course in courses:
-        print(f"| Course: {course[0]} {course[1]} | Professor: {course[2]} | Seats: {course[3]} |")
+def withdraw_course(cursor, student_id, course_id):
+    query = "DELETE FROM enrollment WHERE StudentID = %s AND CourseID = %s"
+    cursor.execute(query, (student_id, course_id))
+    connection.commit()
+    print("Course withdrawn successfully.")
 
+def list_my_classes(cursor, student_id): 
+    query = """ SELECT c.course_name, 
+                GROUP_CONCAT(s.meeting_day ORDER BY s.meeting_day SEPARATOR ', ') AS days,
+                TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
+                TIME_FORMAT(s.end_time, '%H:%i') AS end_time, s.location As location, p.pname AS professor_name
+                FROM enrollments e
+                JOIN courses c ON e.course_id = c.course_id
+                JOIN schedule s ON c.course_id = s.course_id
+                JOIN professors p ON c.professor_id = p.professor_id
+                WHERE e.student_id = %s
+                GROUP BY c.course_id, c.course_name, s.start_time, s.end_time, p.pname, p.department, s.location; """
+    cursor.execute(query, (student_id,))
+    classes = cursor.fetchall()
+    for c in classes:
+        print(f"| Course Name: {c[0]} | Day(s): {c[1]} | Start Time: {c[2]} | End Time: {c[3]} | Location: {c[4]} | Professor: {c[5]} |")
+
+#Enroll students to courses
 def enroll_student(cursor, student_id, course_id):
     # 1. Check prerequisites
     query_prereqs = """ SELECT prerequisite_course_id
@@ -87,14 +102,18 @@ def enroll_student(cursor, student_id, course_id):
     cursor.execute(query_enroll, (student_id, course_id))
     print("Enrollment successful!")
 
+#list all available courses
+def list_courses(cursor): 
+    query = """ SELECT c.course_name, c.description, p.pname, c.capacity
+                FROM courses c, professors p
+                Where c.professor_id = p.professor_id"""
+    cursor.execute(query)
+    courses = cursor.fetchall()
+    for course in courses:
+        print(f"| Course: {course[0]} {course[1]} | Professor: {course[2]} | Seats: {course[3]} |")
 
-def withdraw_course(cursor, connection, student_id, course_id):
-    query = "DELETE FROM enrollment WHERE StudentID = %s AND CourseID = %s"
-    cursor.execute(query, (student_id, course_id))
-    connection.commit()
-    print("Course withdrawn successfully.")
-
-def search_courses(cursor, substring):    #searh for courses based on criteria
+#Searh for courses based on criteria
+def search_courses(cursor, substring):    
     query = """
         SELECT course_name, description, capacity 
         FROM courses 
@@ -105,19 +124,8 @@ def search_courses(cursor, substring):    #searh for courses based on criteria
     for c in courses:
         print(f"Course: {c[0]} | {c[1]} | Seats: {c[2]} |")
 
-def list_my_classes(cursor, student_id): 
-    query = """
-        SELECT c.CourseName, c.MeetingTime, c.MeetingDay, p.FirstName, p.LastName
-        FROM Enrollment e
-        JOIN Courses c ON e.CourseID = c.CourseID
-        JOIN Professors p ON c.ProfessorID = p.ProfessorID
-        WHERE e.StudentID = %s"""
-    cursor.execute(query, (student_id,))
-    classes = cursor.fetchall()
-    for c in classes:
-        print(c)
-
-def list_teaching_professors(cursor): #list all classes taught by professors
+#list all classes taught by professors
+def list_teaching_professors(cursor): 
     query = """ SELECT p.pname, p.department, GROUP_CONCAT(c.course_name SEPARATOR ', ') as Teaching
                 FROM professors p
                 LEFT JOIN courses c on p.professor_id = c.professor_id
@@ -127,6 +135,7 @@ def list_teaching_professors(cursor): #list all classes taught by professors
     for p in professors:
         print(f"Professor: {p[0]} | Deparment: {p[1]} | Course(s): {p[2]} |")
 
+#Show prerequisites for selected class
 def show_prerequisites(cursor, course_id):
     query = """ SELECT c1.course_name AS course_name, c2.course_name AS prerequisite_name
                 FROM prerequisites p
@@ -138,11 +147,47 @@ def show_prerequisites(cursor, course_id):
     for req in prereq:
         print(f"Course: {req[0]} requires {req[1]}")
 
+# Adds new student to database
+def add_student(cursor, connection):
+    sname = input("Enter Full name: ").strip()
+    email = input("Enter Email: ").strip()
+    major = input("Enter Major: ").strip()
+    year = input("Enter enrollment year: ").strip()
+    if not sname or not email or not major or not year:
+        print("Invalid Input. Please Try Again!")
+        return 
+    query = """INSERT INTO students (sname, email, major, enrollment_year) VALUES
+        (%s, %s, %s, %s);"""
+    try:
+        cursor.execute(query, (sname, email, major, year))
+        connection.commit()
+        print(f"Student: {sname} has been added to the database!")
+        return
+    except Exception as e:
+        print(f"Error adding Student: {e}")
+        connection.rollback()
+
+#Check if Student exist in database
+def check_student(cursor, sid):
+    query = """SELECT student_id, sname, email, major, enrollment_year FROM students WHERE student_id = %s;"""
+    cursor.execute(query, (sid,))
+    check = cursor.fetchone()
+    if check:
+        print(f"Welcome Back {check[1]}! ")
+    else:
+        print(f"Student with ID: {sid} does not exits.")
+
 def main():
     connection = connect_to_database()
     if not connection:
         return
     cursor = connection.cursor()
+
+    sid = int(input("Enter Student ID or -1 to sign up: ").strip())
+    if(sid == -1):
+        add_student(cursor, connection)
+    else:
+        check_student(cursor, sid)
 
     while True:
         print("\nMenu:")
@@ -155,7 +200,6 @@ def main():
         print("T - Teaching Professors")
         print("X - Exit")
         choice = input("Select an option: ").upper()
-
         if choice == 'L':
             list_courses(cursor)
         elif choice == 'E':
@@ -165,7 +209,7 @@ def main():
         elif choice == 'W':
             student_id = int(input("Enter your student ID: "))
             course_id = int(input("Enter course ID to withdraw from: "))
-            withdraw_course(cursor, connection, student_id, course_id)
+            withdraw_course(cursor, student_id, course_id)
         elif choice == 'S':
             substring = input("\nEnter course name substring: ")
             search_courses(cursor, substring)

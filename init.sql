@@ -166,7 +166,7 @@ INSERT INTO schedule (course_id, meeting_day, start_time, end_time, location) VA
 (1,'Monday','09:00:00','10:30:00','Room 101'),
 (1,'Thursday','09:00:00','10:30:00','Room 101'),
 (2,'Monday','13:00:00','14:30:00','Room 201'),
-(2,'Thursday','12:00:00','14:30:00','Room 201');
+(2,'Thursday','13:00:00','14:30:00','Room 201');
 
 INSERT INTO enrollments(student_id, course_id) VALUES
 (1,1),
