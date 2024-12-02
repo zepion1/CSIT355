@@ -5,7 +5,7 @@ from mysql.connector import Error
 def connect_to_database():
     try:  
         connection = mysql.connector.connect(
-            host='127.0.0.1',         
+            host='127.0.0.1',  #ip for the database, if local: 'localhost' or '127.0.0.1'
             user='cordovas4',     
             password='Lokos12345!', 
             database='CSIT355'
@@ -16,7 +16,7 @@ def connect_to_database():
         print(f"Error: {e}")
         return None
     
-#Initialize init.sql with mock data   
+#Initialize init.sql with data   
 def init_sql(connection, init_file = 'init.sql'): 
     try:
         cursor = connection.cursor()
@@ -105,6 +105,9 @@ def list_my_classes(cursor, student_id):
                 GROUP BY c.course_id, c.course_name, s.start_time, s.end_time, p.pname, p.department, s.location; """
     cursor.execute(query, (student_id,))
     classes = cursor.fetchall()
+    if not classes:
+        print("You are not register in any course!")
+        return
     for c in classes:
         print(f"| Course Name: {c[0]} | Day(s): {c[1]} | Start Time: {c[2]} | End Time: {c[3]} | Location: {c[4]} | Professor: {c[5]} | Credits: {c[6]} |")    
 
@@ -150,6 +153,10 @@ def show_prerequisites(cursor, course_id):
                 WHERE c1.course_id = %s;"""
     cursor.execute(query,(course_id,))
     prereq = cursor.fetchall()
+    
+    if not prereq:
+        print(f"Course: {course_id} does not have any prerequisites.")
+        return
     for req in prereq:
         print(f"Course: {req[0]} requires {req[1]}")
 
