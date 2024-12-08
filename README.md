@@ -2,5 +2,5 @@
 ## Database Systems Project (2024)
 ## By Samuel Cordova, Oscar Ordonez and Marc Labib
 + Please make sure to install all requirements!
-+  > pip install -r requirements.txt
++ install -r requirements.txt
 + Make sure to use your Database credentials!
