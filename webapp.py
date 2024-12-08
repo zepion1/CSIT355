@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, session, flash
+from flask import Flask, request, jsonify, render_template, redirect, session, flash, make_response
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -6,13 +6,39 @@ app = Flask(__name__)
 app.secret_key = 'THIS IS MY SECRET KEY FOR ENCRYPTION'
 
 # Database connection
-def get_db_connection():
+def connect_to_database():
     return mysql.connector.connect(
         host="127.0.0.1",
-        user="", # database username
-        password="", #database password
+        user="zepion1", # database username
+        password="password1", #database password
         database="CSIT355"
     )
+
+def initialize_database():
+    connection = connect_to_database()
+
+    try:
+        cursor = connection.cursor()
+        with open('init.sql','r') as file:
+            statement = file.read()
+        for query in statement.split(';'):
+            if query.strip():
+                cursor.execute(query)
+        connection.commit()
+        print("Database initialized...")
+    except FileNotFoundError:
+        print(f"Error: File 'init.sql' not found.")
+    except mysql.connector.Error as e:
+        print(f"Error executing SQL query: {e}")
+    finally:
+        cursor.close()
+
+@app.after_request
+def NoCache(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.route('/')
 def home():
@@ -24,7 +50,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        connection = get_db_connection()
+        connection = connect_to_database()
         cursor = connection.cursor(dictionary=True)
 
         query = "SELECT * FROM students WHERE email = %s"
@@ -56,7 +82,7 @@ def register_student():
         password = request.form['password']
         hashed_password = generate_password_hash(password)
 
-        connection = get_db_connection()
+        connection = connect_to_database()
         cursor = connection.cursor()
         query = """
             INSERT INTO students (sname, email, major, enrollment_year, password)
@@ -75,7 +101,7 @@ def dashboard():
     if 'student_id' not in session:
         return redirect('/login')
     
-    connection = get_db_connection()
+    connection = connect_to_database()
     cursor = connection.cursor(dictionary=True)
     student_id = session['student_id']
 
@@ -96,7 +122,7 @@ def enroll():
         return redirect('/login')
     student_id = session['student_id']
     course_id = request.form['course_id']
-    connection = get_db_connection()
+    connection = connect_to_database()
     cursor = connection.cursor(dictionary=True)
 
     prerequ_query = """ SELECT prerequisite_course_id
@@ -147,7 +173,7 @@ def enroll():
 
 @app.route('/view_classes', methods=['GET'])
 def view_classes():
-    connection = get_db_connection()
+    connection = connect_to_database()
     cursor = connection.cursor(dictionary=True)
     query = """ SELECT c.course_id, CONCAT(c.course_name, "  ", c.description) AS course, p.pname, c.capacity, c.credits
                 FROM courses c, professors p
@@ -160,12 +186,14 @@ def view_classes():
 
 @app.route('/schedule', methods=['GET'])
 def view_schedule():
+    if 'student_id' not in session:
+        return redirect('login')
     student_id = session['student_id']
 
-    connection = get_db_connection()
+    connection = connect_to_database()
     cursor = connection.cursor(dictionary=True)
     
-    query = """ SELECT CONCAT(c.course_name, "  ", c.description) AS course, 
+    query = """ SELECT c.course_id, CONCAT(c.course_name, "  ", c.description) AS course, 
                 GROUP_CONCAT(s.meeting_day ORDER BY s.meeting_day SEPARATOR ', ') AS days,
                 TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
                 TIME_FORMAT(s.end_time, '%H:%i') AS end_time, s.location As location, p.pname AS professor_name, c.credits
@@ -181,5 +209,25 @@ def view_schedule():
     connection.close()
     return render_template('schedule.html', schedule=schedule, student=session['student_id'])
 
+@app.route('/withdraw', methods=['POST'])
+def withdraw():
+    if 'student_id' not in session:
+        return redirect('login')
+    student_id = session['student_id']
+    course_id = request.form['course_id']
+
+    connection = connect_to_database()
+    cursor = connection.cursor(dictionary=True)
+    query = "DELETE FROM enrollments WHERE student_id = %s AND course_id = %s;"
+    cursor.execute(query,(student_id, course_id))
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    flash(f"You have successfully dropped course ID {course_id}.", "success")
+    return redirect('/schedule')   
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    initialize_database()
+    app.run(debug=True, host="localhost", port=5000)

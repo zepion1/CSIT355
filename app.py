@@ -289,4 +289,3 @@ if __name__ == "__main__":
         init_sql(connection)
         connection.close()
     main()
-

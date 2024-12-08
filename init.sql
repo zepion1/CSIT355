@@ -196,7 +196,7 @@ INSERT INTO schedule (course_id, meeting_day, start_time, end_time, location) VA
 (104,'Friday','12:00:00','13:30:00','CCIS 103'),
 (105,'Tuesday','12:00:00','13:30:00','CCIS 103'),
 (105,'Friday','12:00:00','13:30:00','CCIS 103'),
-(130,'Monday','12:00:00','13:30:00','SCHMIT 121'),
+(130,'Monday','11:45:00','12:30:00','SCHMIT 121'),
 (130,'Thursday','11:45:00','12:30:00','SCHMIT 121'),
 (131,'Monday','12:00:00','13:30:00','SCHMIT 152'),
 (131,'Thursday','12:00:00','13:30:00','SCHMIT 152'),
@@ -205,13 +205,13 @@ INSERT INTO schedule (course_id, meeting_day, start_time, end_time, location) VA
 (134,'Monday','08:45:00','10:30:00','ART 201'),
 (135,'Friday','09:30:00','11:45:00','ART 119');
 
---INSERT INTO enrollments(student_id, course_id) VALUES
---(10001,101),
---(10001,102),
---(10002,101),
---(10002,102),
---(10003,101),
---(10003,130),
---(10004,101),
---(10004,102),
---(10004,130);
+INSERT INTO enrollments(student_id, course_id) VALUES
+(10001,101),
+(10001,102),
+(10002,101),
+(10002,102),
+(10003,101),
+(10003,130),
+(10004,101),
+(10004,102),
+(10004,130);
