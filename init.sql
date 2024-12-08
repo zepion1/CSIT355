@@ -112,11 +112,14 @@ INSERT INTO professors (pname, email, department) VALUES
 
 
 
---INSERT INTO students(sname, email, major, enrollment_year) VALUES
---('Oscar Ordonez','ordonezc@montclair.edu','Computer Science','2022'),
---('Marc Labib','labibm@montclair.edu','Computer Science','2022'),
---('Alexis Rivas','rivasa@montclair.edu','Computer Science','2023'),
---('Samuel Cordova','cordovas@montclair.edu','Computer Science','2022');
+INSERT INTO students(sname, email, major, enrollment_year, password) VALUES
+('Oscar Ordonez','ordonezc@montclair.edu','Computer Science','2022','scrypt:32768:8:1$NBIFcZKNAOG1qYK4$4b6cd452d95d07e257a707b4307e4d7aa7a344fd719876e43d85b12c64f4c2a8208d76eb94ae53a7954cd1c8aca1a7a055afafeacae2abd797af0b13e1b03a8a'),
+('Marc Labib','labibm@montclair.edu','Computer Science','2022','scrypt:32768:8:1$NBIFcZKNAOG1qYK4$4b6cd452d95d07e257a707b4307e4d7aa7a344fd719876e43d85b12c64f4c2a8208d76eb94ae53a7954cd1c8aca1a7a055afafeacae2abd797af0b13e1b03a8a'),
+('Alexis Rivas','rivasa@montclair.edu','Computer Science','2023','scrypt:32768:8:1$NBIFcZKNAOG1qYK4$4b6cd452d95d07e257a707b4307e4d7aa7a344fd719876e43d85b12c64f4c2a8208d76eb94ae53a7954cd1c8aca1a7a055afafeacae2abd797af0b13e1b03a8a'),
+('Samuel Cordova','cordovas@montclair.edu','Computer Science','2022','scrypt:32768:8:1$NBIFcZKNAOG1qYK4$4b6cd452d95d07e257a707b4307e4d7aa7a344fd719876e43d85b12c64f4c2a8208d76eb94ae53a7954cd1c8aca1a7a055afafeacae2abd797af0b13e1b03a8a'),
+('Alejandra Cordova','cordovaa1@montclair.edu','Fashion','2020','scrypt:32768:8:1$NBIFcZKNAOG1qYK4$4b6cd452d95d07e257a707b4307e4d7aa7a344fd719876e43d85b12c64f4c2a8208d76eb94ae53a7954cd1c8aca1a7a055afafeacae2abd797af0b13e1b03a8a'),
+('Mike Tubach','tubachm1@montclair.edu','Chemistry','2023','scrypt:32768:8:1$NBIFcZKNAOG1qYK4$4b6cd452d95d07e257a707b4307e4d7aa7a344fd719876e43d85b12c64f4c2a8208d76eb94ae53a7954cd1c8aca1a7a055afafeacae2abd797af0b13e1b03a8a');
+
 
 INSERT INTO courses(course_name, description, capacity, professor_id, credits) VALUES
 ('CSIT 104','Python Programming I','25',1009,3),
@@ -148,7 +151,7 @@ INSERT INTO courses(course_name, description, capacity, professor_id, credits) V
 ('CSIT 495','Special Topics in Undergraduate CS','25',1005,3),
 ('BUS 125','Business Mathematics','25',1023,3),
 ('BUS 215','Business Statistics','15',1024,3),
-('MATH 122','Calculus I','24',1021,4),
+('MATH 122','Calculus I','24',1022,4),
 ('MATH 221','Calculus II','18',1002,4),
 ('BIOL 112','Principles of Biology: Introduction to the Cell','24',1025,4),
 ('BIOL 113','Principles of Biology: Organisms and Diversity','25',1026,4),
@@ -194,12 +197,21 @@ INSERT INTO schedule (course_id, meeting_day, start_time, end_time, location) VA
 (105,'Tuesday','12:00:00','13:30:00','CCIS 103'),
 (105,'Friday','12:00:00','13:30:00','CCIS 103'),
 (130,'Monday','12:00:00','13:30:00','SCHMIT 121'),
-(130,'Thursday','12:00:00','13:30:00','SCHMIT 121'),
+(130,'Thursday','11:45:00','12:30:00','SCHMIT 121'),
 (131,'Monday','12:00:00','13:30:00','SCHMIT 152'),
-(131,'Thursday','12:00:00','13:30:00','SCHMIT 152');
+(131,'Thursday','12:00:00','13:30:00','SCHMIT 152'),
+(132,'Wednesday','14:00:00','15:45:00','LIFE 129'),
+(133,'Thursday',' 12:45:00','14:00:00','LIFE 225'),
+(134,'Monday','08:45:00','10:30:00','ART 201'),
+(135,'Friday','09:30:00','11:45:00','ART 119');
 
 --INSERT INTO enrollments(student_id, course_id) VALUES
 --(10001,101),
---(10002,101),
 --(10001,102),
---(10002,102);
+--(10002,101),
+--(10002,102),
+--(10003,101),
+--(10003,130),
+--(10004,101),
+--(10004,102),
+--(10004,130);
