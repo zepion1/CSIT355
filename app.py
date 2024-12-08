@@ -6,8 +6,8 @@ def connect_to_database():
     try:  
         connection = mysql.connector.connect(
             host='127.0.0.1',  #ip for the database, if local: 'localhost' or '127.0.0.1'
-            user='cordovas4',     
-            password='Lokos12345!', 
+            user='zepion1',     
+            password='password1', 
             database='CSIT355'
             )
         cursor = connection.cursor(buffered=True)

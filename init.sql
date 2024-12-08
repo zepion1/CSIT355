@@ -29,6 +29,7 @@ CREATE TABLE students (
     email VARCHAR(100) NOT NULL,
     major VARCHAR(50),
     enrollment_year INT,
+    password VARCHAR(255) NOT NULL,
     gpa FLOAT
 ); ALTER TABLE students AUTO_INCREMENT = 10001;
 
@@ -37,7 +38,7 @@ CREATE TABLE courses (
     course_id INT AUTO_INCREMENT PRIMARY KEY,
     course_name VARCHAR(100) NOT NULL,
     description TEXT,
-    capacity INT CHECK (capacity > 0),
+    capacity INT CHECK (capacity < 26),
     professor_id INT,
     credits INT,
     FOREIGN KEY (professor_id) REFERENCES professors(professor_id)
@@ -99,42 +100,60 @@ INSERT INTO professors (pname, email, department) VALUES
 ('Dajin Wang',' wangd@montclair.edu','Computing'),
 ('Jiayin Wang',' wangji@montclair.edu','Computing'),
 ('Weitian Wang',' wangw@montclair.edu','Computing'),
-('Michelle Zhu',' zhumi@montclair.edu','Computing');
+('Michelle Zhu',' zhumi@montclair.edu','Computing'),
+('Aihua Li','lia@montclair.edu','Mathematics'),
+('Arup Mukherjee','mukherjeea@montclair.edu','Mathematics'),
+('Frank Aquilino','aquilinof@montclair.edu','Business'),
+('Beixin Lin','linb@montclair.edu','Business'),
+('Thomas Mueller','muellert@montclair.edu','Science'),
+('Colette Feehan','feehanc@mail.montclair.edu','Science'),
+('Helen Castillo','castilloh@mail.montclair.edu','ART'),
+('Michelle Burton','burtonm@mail.montclair.edu','ART');
 
-INSERT INTO students(sname, email, major, enrollment_year) VALUES
-('Oscar Ordonez','ordonezc@montclair.edu','Computer Science','2022'),
-('Marc Labib','labibm@montclair.edu','Computer Science','2022'),
-('Alexis Rivas','rivasa@montclair.edu','Computer Science','2023'),
-('Samuel Cordova','cordovas@montclair.edu','Computer Science','2022');
+
+
+--INSERT INTO students(sname, email, major, enrollment_year) VALUES
+--('Oscar Ordonez','ordonezc@montclair.edu','Computer Science','2022'),
+--('Marc Labib','labibm@montclair.edu','Computer Science','2022'),
+--('Alexis Rivas','rivasa@montclair.edu','Computer Science','2023'),
+--('Samuel Cordova','cordovas@montclair.edu','Computer Science','2022');
 
 INSERT INTO courses(course_name, description, capacity, professor_id, credits) VALUES
-('CSIT 104','Python Programming I','30',1009,3),
-('CSIT 111','Fundamentals of Java Programming','40',1008,3),
-('CSIT 112','Fundamentals of Programming II','30',1007,3),
-('CSIT 170','Discrete Mathematics','60',1006,3),
-('CSIT 212','Data Structures and Algorithms','30',1005,3),
-('CSIT 230','Computer Systems','30',1004,3),
-('CSIT 231','Systems Programming','30',1003,3),
-('CSIT 313','Fundamentals of Programming Languages','30',1002,3),
-('CSIT 315','Software Engineering I','30',1001,3),
-('CSIT 336','Game Development','30',1010,3),
-('CSIT 337','InternetComputing','45',1014,3),
-('CSIT 340','Computer Networks','45',1012,3),
-('CSIT 345','Operating Systems','30',1013,3),
-('CSIT 355','Database Systems','30',1012,3),
-('CSIT 357','Artificial Intelligence','60',1015,3),
-('CSIT 359','Data Visualization','30',1012,3),
-('CSIT 379','Computer Science Theory','30',1017,3),
-('CSIT 415','Software Engineering II','30',1018,3),
-('CSIT 416','IT Project Management','40',1019,3),
+('CSIT 104','Python Programming I','25',1009,3),
+('CSIT 111','Fundamentals of Java Programming','25',1008,3),
+('CSIT 112','Fundamentals of Programming II','25',1007,3),
+('CSIT 170','Discrete Mathematics','25',1006,3),
+('CSIT 212','Data Structures and Algorithms','25',1005,3),
+('CSIT 230','Computer Systems','25',1004,3),
+('CSIT 231','Systems Programming','25',1003,3),
+('CSIT 313','Fundamentals of Programming Languages','25',1002,3),
+('CSIT 315','Software Engineering I','25',1001,3),
+('CSIT 336','Game Development','25',1010,3),
+('CSIT 337','InternetComputing','25',1014,3),
+('CSIT 340','Computer Networks','25',1008,3),
+('CSIT 345','Operating Systems','25',1013,3),
+('CSIT 355','Database Systems','25',1012,3),
+('CSIT 357','Artificial Intelligence','25',1015,3),
+('CSIT 359','Data Visualization','25',1012,3),
+('CSIT 379','Computer Science Theory','25',1017,3),
+('CSIT 415','Software Engineering II','25',1018,3),
+('CSIT 416','IT Project Management','25',1019,3),
 ('CSIT 431','Introduction to Robotics','25',1020,3),
-('CSIT 432','Systems Administration','40',1012,3),
+('CSIT 432','Systems Administration','25',1002,3),
 ('CSIT 440','Principles of Data Mining','25',1016,3),
 ('CSIT 451','MobileComputing','25',1001,3),
-('CSIT 455','Machine Learning','40',1002,3),
-('CSIT 460','Computer Security','40',1003,3),
+('CSIT 455','Machine Learning','25',1002,3),
+('CSIT 460','Computer Security','25',1003,3),
 ('CSIT 491','Co-op CS and IT','25',1004,3),
-('CSIT 495','Special Topics in Undergraduate CS','25',1005,3);
+('CSIT 495','Special Topics in Undergraduate CS','25',1005,3),
+('BUS 125','Business Mathematics','25',1023,3),
+('BUS 215','Business Statistics','15',1024,3),
+('MATH 122','Calculus I','24',1021,4),
+('MATH 221','Calculus II','18',1002,4),
+('BIOL 112','Principles of Biology: Introduction to the Cell','24',1025,4),
+('BIOL 113','Principles of Biology: Organisms and Diversity','25',1026,4),
+('ARTX 120','Introduction to Apparel Construction','10',1027,3),
+('ARTX 298','Textiles','24',1028,3);
 
 INSERT INTO prerequisites(course_id, prerequisite_course_id) VALUES
 (103,102),
@@ -164,17 +183,23 @@ INSERT INTO prerequisites(course_id, prerequisite_course_id) VALUES
 (127,117);
 
 INSERT INTO schedule (course_id, meeting_day, start_time, end_time, location) VALUES
-(101,'Monday','09:00:00','10:30:00','Room 101'),
-(101,'Thursday','09:00:00','10:30:00','Room 101'),
-(102,'Monday','13:00:00','14:30:00','Room 201'),
-(102,'Thursday','13:00:00','14:30:00','Room 201'),
-(103,'Tuesday','10:00:00','11:30:00','Room 202'),
-(103,'Friday','10:00:00','11:30:00','Room 202'),
-(104,'Tuesday','12:00:00','13:30:00','Room 103'),
-(104,'Friday','12:00:00','13:30:00','Room 103');
+(101,'Monday','09:00:00','10:30:00','CCIS 101'),
+(101,'Thursday','09:00:00','10:30:00','CCIS 101'),
+(102,'Monday','13:00:00','14:30:00','CCIS 201'),
+(102,'Thursday','13:00:00','14:30:00','CCIS 201'),
+(103,'Tuesday','10:00:00','11:30:00','CCIS 202'),
+(103,'Friday','10:00:00','11:30:00','CCIS 202'),
+(104,'Tuesday','12:00:00','13:30:00','CCIS 103'),
+(104,'Friday','12:00:00','13:30:00','CCIS 103'),
+(105,'Tuesday','12:00:00','13:30:00','CCIS 103'),
+(105,'Friday','12:00:00','13:30:00','CCIS 103'),
+(130,'Monday','12:00:00','13:30:00','SCHMIT 121'),
+(130,'Thursday','12:00:00','13:30:00','SCHMIT 121'),
+(131,'Monday','12:00:00','13:30:00','SCHMIT 152'),
+(131,'Thursday','12:00:00','13:30:00','SCHMIT 152');
 
-INSERT INTO enrollments(student_id, course_id) VALUES
-(10001,101),
-(10002,101),
-(10001,102),
-(10002,102);
+--INSERT INTO enrollments(student_id, course_id) VALUES
+--(10001,101),
+--(10002,101),
+--(10001,102),
+--(10002,102);
