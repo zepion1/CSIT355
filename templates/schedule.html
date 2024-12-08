@@ -27,14 +27,76 @@
         th {
             background-color: #f4f4f4;
         }
+        .drop-button {
+            padding: 5px 10px;
+            background-color: #cac9c9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .drop-button:hover {
+            background-color: #838282;
+        }
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .logout-button {
+            padding: 10px 20px;
+            background-color: #e27272;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .logout-button:hover {
+            background-color: #db4343;
+        }
+        
     </style>
 </head>
 <body>
-    <!-- Welcome Message -->
+    <form action="/logout" method="POST" style="position: absolute; top: 20px; right: 20px;">
+        <button type="submit" class="logout-button">Logout</button>
+        <script>
+            document.querySelector('.logout-button').addEventListener('click', function () {
+                if ('caches' in window) {
+                    caches.keys().then(function (keyList) {
+                        return Promise.all(keyList.map(function (key) {
+                            return caches.delete(key);
+                        }));
+                    });
+                }
+            });
+        </script>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
     <h1>Your Schedule</h1>
     <p style="text-align: center;">Here are your enrolled courses:</p>
-
-    <!-- Schedule Table -->
     <table>
         <thead>
             <tr>
@@ -45,6 +107,7 @@
                 <th>Location</th>
                 <th>Professor</th>
                 <th>Credits</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -57,12 +120,17 @@
                 <td>{{ course.location }}</td>
                 <td>{{ course.professor_name }}</td>
                 <td>{{ course.credits }}</td>
+                <td>
+                    <form method="POST" action="/withdraw">
+                        <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                        <button type="submit" class="drop-button">Drop</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Back to Dashboard Button -->
     <form action="/dashboard" method="GET" style="text-align: center; margin-top: 20px;">
         <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
             Back to Dashboard
