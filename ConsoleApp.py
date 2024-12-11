@@ -113,13 +113,13 @@ def list_my_classes(cursor, student_id):
 
 #list all available courses
 def list_courses(cursor): 
-    query = """ SELECT c.course_name, c.description, p.pname, c.capacity, c.credits
+    query = """ SELECT c.course_id, c.course_name, c.description, p.pname, c.capacity, c.credits
                 FROM courses c, professors p
                 Where c.professor_id = p.professor_id;"""
     cursor.execute(query)
     courses = cursor.fetchall()
     for course in courses:
-        print(f"| Course: {course[0]} {course[1]} | Professor: {course[2]} | Seats: {course[3]} | Credits: {course[4]} |")
+        print(f"CourseID: {course[0]} | Course: {course[1]} {course[2]} | Professor: {course[3]} | Seats: {course[4]} | Credits: {course[5]} |")
 
 #Search for courses based on criteria
 def search_courses(cursor, substring):    
