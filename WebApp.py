@@ -9,8 +9,8 @@ app.secret_key = 'THIS IS MY SECRET KEY FOR ENCRYPTION'
 def connect_to_database():
     return mysql.connector.connect(
         host="127.0.0.1",
-        user="", # database username
-        password="", #database password
+        user="zepion1", # database username
+        password="password1", #database password
         database="CSIT355"
     )
 
@@ -225,7 +225,35 @@ def withdraw():
     connection.close()
 
     flash(f"You have successfully dropped course ID {course_id}.", "success")
-    return redirect('/schedule')   
+    return redirect('/schedule')
+
+@app.route('/search', methods=['GET'])
+def search():
+    if 'student_id' not in session:
+        return redirect('login')
+    connection = connect_to_database()
+    cursor = connection.cursor(dictionary=True)
+    student_id = session['student_id']
+
+    query = "SELECT student_id, sname FROM students WHERE student_id = %s"
+    cursor.execute(query, (student_id,))
+    student = cursor.fetchone()
+
+    search = request.args.get('search')
+
+    seach_query = """SELECT c.course_id, CONCAT(c.course_name, "  ", c.description) AS course, p.pname, c.capacity, c.credits
+ 	                 FROM courses c, professors p
+                     Where c.course_id and c.professor_id = p.professor_id and 
+                     (c.course_id LIKE CONCAT('%', %s,'%') or 
+                     c.course_name LIKE CONCAT('%', %s,'%') or 
+                     c.description LIKE CONCAT('%', %s,'%') or 
+                     p.pname LIKE CONCAT('%', %s,'%'));"""
+    
+    cursor.execute(seach_query, (search, search, search, search))
+    courses = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return  render_template ('search_results.html', courses=courses, student=student)
 
 if __name__ == '__main__':
     initialize_database()
