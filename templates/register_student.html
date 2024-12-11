@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Registration</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,6 +50,12 @@
         .form-group button:hover {
             background-color: #0056b3;
         }
+        .form-container .login-button {
+            background-color: #5dbb73;
+        }
+         .form-container .login-button:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +84,11 @@
             </div>
             <div class="form-group">
                 <button type="submit">Register</button>
+            </div>
+        </form>
+        <form action="/login">
+            <div class="form-group">
+                <button type="submit" class="button login-button">Login</button>
             </div>
         </form>
     </div>

@@ -4,69 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .drop-button {
-            padding: 5px 10px;
-            background-color: #cac9c9;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .drop-button:hover {
-            background-color: #838282;
-        }
-        .flash-message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .flash-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .flash-error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .logout-button {
-            padding: 10px 20px;
-            background-color: #e27272;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .logout-button:hover {
-            background-color: #db4343;
-        }
-        
-    </style>
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
     <form action="/logout" method="POST" style="position: absolute; top: 20px; right: 20px;">

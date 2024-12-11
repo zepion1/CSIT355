@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <script src="static/js/scripts.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">  
 </head>
 <body>
     <div class="header-container">
@@ -48,6 +47,7 @@
     {% endif %}
     {% endwith %}
     
+    {% if courses %}
     <table>
         <thead>
             <tr>
@@ -59,8 +59,26 @@
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody id="classes-table-body">
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.course_id }}</td>
+                <td>{{ course.course }}</td>
+                <td>{{ course.pname }}</td>
+                <td>{{ course.capacity }}</td>
+                <td>{{ course.credits }}</td>
+                <td>
+                    <form method="POST" action="/enroll">
+                        <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                        <button type="submit" class="enroll-button">Enroll</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p>No courses found matching your query.</p>
+    {% endif %}
 </body>
 </html>

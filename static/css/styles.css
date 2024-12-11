@@ -1,0 +1,156 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+h1 {
+    text-align: center;
+}
+h2 {
+    text-align: center;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+table, th, td {
+    border: 1px solid #ccc;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #f4f4f4;
+}
+.button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: #0056b3;
+}
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.logout-button {
+    padding: 10px 20px;
+    background-color: #e27272;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.logout-button:hover {
+    background-color: #db4343;
+}
+.enroll-button {
+    padding: 5px 10px;
+    background-color: #ced3d8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.enroll-button:hover {
+    background-color: #8e9194;
+}
+.flash-message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+.flash-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.flash-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.view-schedule-button {
+    padding: 10px 20px;
+    background-color: #91cfa0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.view-schedule-button:hover {
+    background-color: #218838;
+}
+.search-bar {
+margin: 20px 0;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.search-bar input[type="text"] {
+width: 300px;
+padding: 10px;
+font-size: 16px;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
+.search-bar button {
+padding: 10px 15px;
+font-size: 16px;
+color: #fff;
+background-color: #1f88f8;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+margin-left: 5px;
+}
+.search-bar button:hover {
+background-color: #0056b3;
+}
+.drop-button {
+    padding: 5px 10px;
+    background-color: #cac9c9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.drop-button:hover {
+    background-color: #838282;
+}
+.flash-message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+.flash-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.flash-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.logout-button {
+    padding: 10px 20px;
+    background-color: #e27272;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.logout-button:hover {
+    background-color: #db4343;
+}
