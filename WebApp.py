@@ -9,8 +9,8 @@ app.secret_key = 'THIS IS MY SECRET KEY FOR ENCRYPTION'
 def connect_to_database():
     return mysql.connector.connect(
         host="127.0.0.1",
-        user="zepion1", # database username
-        password="password1", #database password
+        user="", # database username
+        password="", #database password
         database="CSIT355"
     )
 
