@@ -88,7 +88,6 @@ def register_student():
             VALUES (%s, %s, %s, %s, %s)
         """
         cursor.execute(query, (full_name, email, major, year_of_enrollment, hashed_password))
-        student_id = cursor.lastrowid
         connection.commit()
         cursor.close()
         connection.close()
@@ -159,7 +158,7 @@ def enroll():
     if cursor.fetchall():
         cursor.close()
         connection.close()
-        flash('This course conflicts with yout current schedule.', 'error')
+        flash('This course conflicts with your current schedule.', 'error')
         return redirect('/dashboard')
 
     query = "INSERT INTO enrollments (student_id, course_id) VALUES (%s, %s);"
@@ -242,12 +241,12 @@ def search():
     search = request.args.get('search')
 
     seach_query = """SELECT c.course_id, CONCAT(c.course_name, "  ", c.description) AS course, p.pname, c.capacity, c.credits
- 	                 FROM courses c, professors p
-                     Where c.course_id and c.professor_id = p.professor_id and 
-                     (c.course_id LIKE CONCAT('%', %s,'%') or 
-                     c.course_name LIKE CONCAT('%', %s,'%') or 
-                     c.description LIKE CONCAT('%', %s,'%') or 
-                     p.pname LIKE CONCAT('%', %s,'%'));"""
+                    FROM courses c, professors p
+                    Where c.course_id and c.professor_id = p.professor_id and 
+                    (c.course_id LIKE CONCAT('%', %s,'%') or 
+                    c.course_name LIKE CONCAT('%', %s,'%') or 
+                    c.description LIKE CONCAT('%', %s,'%') or 
+                    p.pname LIKE CONCAT('%', %s,'%'));"""
     
     cursor.execute(seach_query, (search, search, search, search))
     courses = cursor.fetchall()
