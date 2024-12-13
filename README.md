@@ -4,3 +4,6 @@
 + Please make sure to install all requirements!
 + > pip install -r requirements.txt
 + Make sure to use your Database credentials!
++ There is 2 versions of the Course Management System
++ "ConsoleApp.py" is the version that run on the terminal
++ "WebApp.py" is the webaplication that was built with the Flask template
