@@ -6,8 +6,8 @@ def connect_to_database():
     try:  
         connection = mysql.connector.connect(
             host='127.0.0.1',  #ip for the database, if local: 'localhost' or '127.0.0.1'
-            user='',     #database user
-            password='', #database password
+            user='cordovas4',     #database user
+            password='Lokos12345!', #database password
             database='CSIT355'
             )
         cursor = connection.cursor(buffered=True)
@@ -17,7 +17,7 @@ def connect_to_database():
         return None
     
 #Initialize init.sql with data   
-def init_sql(connection, init_file = 'static\sql\init.sql'): 
+def init_sql(connection, init_file = 'static/sql/init.db'): 
     try:
         cursor = connection.cursor()
         with open(init_file,'r') as file:
@@ -40,6 +40,17 @@ def enroll_student(cursor, student_id, connection):
         connection.reconnect()
     # 1. Check prerequisites
     course_id = input("Enter course ID to enroll in: ")
+    
+    query_exist = """ select *
+                    from courses
+                    where course_id = %s;"""
+    cursor.execute(query_exist,(course_id,))
+    not_exists = cursor.fetchall()
+    
+    if not_exists == []:
+        print(f"CourseID: {course_id} does not exists!")
+        return False
+    
     query_prereqs = """ SELECT prerequisite_course_id
                         FROM prerequisites
                         WHERE course_id = %s AND prerequisite_course_id 
@@ -55,7 +66,18 @@ def enroll_student(cursor, student_id, connection):
             print(f"- Prerequisite Course ID: {prereq[0]}")
         return False
 
-    # 2. Check schedule conflicts
+        # 2. Check for duplicate enrollment
+    query_duplicate = """SELECT 1
+                        FROM enrollments
+                        WHERE student_id = %s AND course_id = %s; """
+    cursor.execute(query_duplicate, (student_id, course_id))
+    duplicate = cursor.fetchone()
+
+    if duplicate:
+        print("You are already enrolled in this course.")
+        return False
+
+    # 3. Check schedule conflicts
     query_schedule_conflicts = """  SELECT  e.course_id AS conflicting_course_id, s1.meeting_day, s1.start_time, s1.end_time
                                     FROM enrollments e
                                     JOIN schedule s1 ON e.course_id = s1.course_id
@@ -73,17 +95,7 @@ def enroll_student(cursor, student_id, connection):
             print(f"- Conflict with Course ID: {conflict[0]} on {conflict[1]} from {conflict[2]} to {conflict[3]}")
             return False
 
-    # 3. Check for duplicate enrollment
-    query_duplicate = """SELECT 1
-                        FROM enrollments
-                        WHERE student_id = %s AND course_id = %s; """
-    cursor.execute(query_duplicate, (student_id, course_id))
-    duplicate = cursor.fetchone()
-
-    if duplicate:
-        print("You are already enrolled in this course.")
-        return False
-
+    
     # 4. Enroll in the course
     query_enroll = "INSERT INTO enrollments (student_id, course_id) VALUES (%s, %s);"
     cursor.execute(query_enroll, (student_id, course_id))
@@ -93,7 +105,7 @@ def enroll_student(cursor, student_id, connection):
 
 #List classes from student
 def list_my_classes(cursor, student_id): 
-    query = """ SELECT c.course_name, 
+    query = """ SELECT CONCAT(c.course_name ,' ', c.description), 
                 GROUP_CONCAT(s.meeting_day ORDER BY s.meeting_day SEPARATOR ', ') AS days,
                 TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
                 TIME_FORMAT(s.end_time, '%H:%i') AS end_time, s.location As location, p.pname AS professor_name, c.credits
@@ -108,18 +120,26 @@ def list_my_classes(cursor, student_id):
     if not classes:
         print("You are not register in any course!")
         return
+    total_credits = 0
     for c in classes:
-        print(f"| Course Name: {c[0]} | Day(s): {c[1]} | Start Time: {c[2]} | End Time: {c[3]} | Location: {c[4]} | Professor: {c[5]} | Credits: {c[6]} |")    
-
+        print(f"| Course Name: {c[0]} | Day(s): {c[1]} | Start Time: {c[2]} | End Time: {c[3]} | Location: {c[4]} | Professor: {c[5]} | Credits: {c[6]} |")
+        total_credits += c[6]  
+    print(f"Total Credits: {total_credits}")
 #list all available courses
 def list_courses(cursor): 
-    query = """ SELECT c.course_id, c.course_name, c.description, p.pname, c.capacity, c.credits
-                FROM courses c, professors p
-                Where c.professor_id = p.professor_id;"""
+    query = """ SELECT c.course_id, CONCAT(c.course_name, "  ", c.description) AS course, p.pname, p.department,
+                GROUP_CONCAT(s.meeting_day) AS days,
+                TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
+                TIME_FORMAT(s.end_time, '%H:%i') AS end_time, c.capacity, s.location As location, c.credits
+                FROM courses c
+                JOIN schedule s ON c.course_id = s.course_id
+                JOIN professors p ON c.professor_id = p.professor_id
+                WHERE c.professor_id = p.professor_id
+                GROUP BY c.course_id, c.course_name, s.start_time, s.end_time, p.pname, p.department, s.location"""
     cursor.execute(query)
     courses = cursor.fetchall()
     for course in courses:
-        print(f"CourseID: {course[0]} | Course: {course[1]} {course[2]} | Professor: {course[3]} | Seats: {course[4]} | Credits: {course[5]} |")
+        print(f"CourseID: {course[0]} | Course Name: {course[1]} | Professor: {course[2]} | Department: {course[3]} | Days: {courses[4][4]} | Start time: {course[5]} | End Time: {course[6]} | Capacity: {course[7]} | location: {course[8]} | Credits: {course[9]}")
 
 #Search for courses based on criteria
 def search_courses(cursor, substring):    
@@ -135,18 +155,18 @@ def search_courses(cursor, substring):
 
 #list all classes taught by professors
 def list_teaching_professors(cursor): 
-    query = """ SELECT p.pname, p.department, GROUP_CONCAT(c.course_name SEPARATOR ', ') as Teaching
+    query = """ SELECT p.pname, p.department, GROUP_CONCAT(c.course_name SEPARATOR ', ') as Teaching, SUM(c.credits)
                 FROM professors p
                 LEFT JOIN courses c on p.professor_id = c.professor_id
                 GROUP BY p.professor_id, p.pname, p.department;"""
     cursor.execute(query)
     professors = cursor.fetchall()
     for p in professors:
-        print(f"Professor: {p[0]} | Department: {p[1]} | Course(s): {p[2]} |")
+        print(f"Professor: {p[0]} | Department: {p[1]} | Course(s): {p[2]} | Credit Load: {p[3]}")
 
 #Show prerequisites for selected class
 def show_prerequisites(cursor, course_id):
-    query = """ SELECT c1.course_name AS course_name, c2.course_name AS prerequisite_name
+    query = """ SELECT concat(c1.course_name,' ', c1.description) AS course_name, concat(c2.course_name,' ',c2.description) AS prerequisite_name
                 FROM prerequisites p
                 JOIN courses c1 ON p.course_id = c1.course_id
                 JOIN courses c2 ON p.prerequisite_course_id = c2.course_id
@@ -158,7 +178,7 @@ def show_prerequisites(cursor, course_id):
         print(f"Course: {course_id} does not have any prerequisites.")
         return
     for req in prereq:
-        print(f"Course: {req[0]} requires {req[1]}")
+        print(f"Course: {req[0]} | Requires: {req[1]}")
 
 # Adds new student to database
 def add_student(cursor, connection):
