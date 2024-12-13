@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, session, flash, make_response
+from flask import Flask, request, jsonify, render_template, redirect, session, flash
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -9,8 +9,8 @@ app.secret_key = 'THIS IS MY SECRET KEY FOR ENCRYPTION'
 def connect_to_database():
     return mysql.connector.connect(
         host="127.0.0.1",
-        user="", # database username
-        password="", #database password
+        user="cordovas4", # database username
+        password="Lokos12345!", #database password
         database="CSIT355"
     )
 
@@ -18,7 +18,7 @@ def initialize_database():
     connection = connect_to_database()
     try:
         cursor = connection.cursor()
-        with open('static/sql/init.sql','r') as file:
+        with open('static/sql/init.db','r') as file:
             statement = file.read()
         for query in statement.split(';'):
             if query.strip():
@@ -257,4 +257,4 @@ def search():
 
 if __name__ == '__main__':
     initialize_database()
-    app.run(debug=True, host="localhost", port=5000)
+    app.run(debug=True, host="127.0.0.1", port=5000)
