@@ -3,7 +3,7 @@ import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'THIS IS MY SECRET KEY FOR ENCRYPTION'
+app.secret_key = ''
 
 # Database connection
 def connect_to_database():
